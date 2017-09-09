@@ -1,2 +1,2 @@
 # todo-app
-A simple TODO app using Node.js, Express and MySQL.
+สร้าง TODO app อย่างง่ายๆ โดยใช้ Node.js, Express(Backend) และ MySQL(Database).
