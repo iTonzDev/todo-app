@@ -1,20 +1,18 @@
 var app = require('express')();
 var bodyParser = require('body-parser');
 var path = __dirname + '/views/';
+var mysql = require('mysql')
+var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '1234',
+    database: 'todo_app'
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var result = {
-    "todolist": [{
-        "id": 1,
-        "name": "test1"
-    }, {
-        "id": 2,
-        "name": "test2"
-    }]
-};
-var id = result.todolist.length;
+var id = 0;
 
 app.get('/', function(req, res) {
     res.sendFile(path + 'index.html');
@@ -22,8 +20,14 @@ app.get('/', function(req, res) {
 
 app.get('/todo-list', function(req, res) {
     //res.send or res.json
-    //console.log('id : ' + id);
-    res.json(result);
+    var paramOut = {};
+    connection.query('select * from todo order by id desc', function(err, rows, fields) {
+        if (err) throw err;
+        //console.log(rows);
+        paramOut.todolist = rows;
+        id = rows.length;
+        res.json(paramOut);
+    });
 });
 
 app.post('/add', function(req, res) {
