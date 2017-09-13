@@ -22,13 +22,13 @@ app.get('/', function(req, res) {
 
 app.get('/todo-list', function(req, res) {
     //res.send or res.json
-    console.log('id : ' + id);
+    //console.log('id : ' + id);
     res.json(result);
 });
 
 app.post('/add', function(req, res) {
-    console.log('add');
-    console.log('todoName : ' + req.body.todoName);
+    //console.log('add');
+    //console.log('todoName : ' + req.body.todoName);
     var paramOut = {
         "todolist": [{
             "id": (++id),
