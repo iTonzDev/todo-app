@@ -5,17 +5,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Todo App</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
 
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <style>
+        .todo-success {
+            text-decoration: line-through;
+        }
+    </style>
     <script type="text/javascript">
         $(function() {
-            $('#addTodo').click(function(e) {
+            $.ajax({
+                type: 'GET',
+                contentType: 'application/json',
+                url: 'http://localhost:7777/todo-list',
+                success: function(data) {
+                    todoComponent(data);
+                }
+            });
 
+            $("input").keypress(function(event) {
+                if (event.which == 13) {
+                    event.preventDefault();
+                    $('#addTodo').click();
+                }
+            });
+
+            $('#addTodo').click(function(e) {
                 var data = {};
                 data.todoName = $('#todoName').val();
 
@@ -25,59 +45,66 @@
                     contentType: 'application/json',
                     url: 'http://localhost:7777/add',
                     success: function(data) {
-                        swal(
-                            'Success',
-                            '',
-                            'success'
-                        )
-                        var markup = `<tr><td><label class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input">
-                                <span class="custom-control-indicator"></span>
-                                <span class="custom-control-description">` + data.todoName + `</span>
-                            </label></td></tr>`;
-                        $("#showTodo table tbody").append(markup);
-                        $('#todoName').val('');
+                        swal('Success', '', 'success');
+                        todoComponent(data);
                     }
                 });
             });
 
         });
+
+        function todoComponent(data) {
+            var todo = data.todolist;
+            for (var key in todo) {
+                var idTodoCheck = 'todoCheck_' + todo[key].id;
+                var markup = `<tr><td><label class="custom-control custom-checkbox"  id="label_` + idTodoCheck + `">
+                        <input type="checkbox" class="custom-control-input"  onchange="checkTodo('` + idTodoCheck + `')" id="` + idTodoCheck + `"/>
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description">` + todo[key].name + `</span>
+                    </label></td></tr>`;
+                $("#showTodo table tbody").append(markup);
+            }
+            $('#todoName').val('');
+        }
+
+        function checkTodo(checkboxName) {
+            var checkbox = $('#' + checkboxName);
+            checkbox.attr('checked', !checkbox.attr('checked'));
+            if (checkbox.attr('checked') == 'checked') {
+                $('#label_' + checkboxName).addClass('todo-success');
+            } else {
+                $('#label_' + checkboxName).removeClass('todo-success');
+            }
+        }
+
+        function showHistory() {
+            alert('showHistory');
+        }
     </script>
 </head>
 
 <body>
 
     <div class="container" style="margin-top:50px">
-        <h1>Todo List</h1>
-        <div>
-            <p>
+        <div class="row">
+            <h1 class="col-12">Todo List</h1>
+
+            <p class="col-12">
                 <input type="text" id="todoName" name="todoName" class="form-control" />
             </p>
-            <input type="button" value="Add" class="form-control btn btn-primary" id="addTodo" />
-        </div>
-        <div id="showTodo" style="margin-top:50px">
-            <table class="table table-bordered">
-                <tbody>
-                    <tr>
-                        <td>
-                            <label class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input">
-                                <span class="custom-control-indicator"></span>
-                                <span class="custom-control-description">test1</span>
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input">
-                                <span class="custom-control-indicator"></span>
-                                <span class="custom-control-description">test2</span>
-                            </label>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+            <div class="col-12">
+                <input type="button" value="Add" class="form-control btn btn-primary" id="addTodo" />
+            </div>
+            <div class="col-12" style="margin-top:10px;margin-bottom:10px;">
+                <a href="#" class="badge badge-success" onclick="showHistory()">History</a>
+            </div>
+            <div class="col-12" id="showTodo">
+                <table class="table table-bordered">
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
