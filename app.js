@@ -47,7 +47,8 @@ app.put('/history', function(req, res) {
 });
 
 app.use('*', function(req, res) {
-    res.send('Page Not Found!!');
+    //res.send('Page Not Found!!');
+    res.sendFile(path + '404.html');
 });
 
 app.listen(7777, function() {
