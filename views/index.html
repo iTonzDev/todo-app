@@ -53,8 +53,9 @@
 
         });
 
-        function todoComponent(data) {
+        function todoComponent(data, flag) {
             var todo = data.todolist;
+            var trNumber = $('#showTodo table tbody tr').length;
             for (var key in todo) {
                 var idTodoCheck = 'todoCheck_' + todo[key].id;
                 var markup = `<tr><td><label class="custom-control custom-checkbox"  id="label_` + idTodoCheck + `">
@@ -62,7 +63,11 @@
                         <span class="custom-control-indicator"></span>
                         <span class="custom-control-description">` + todo[key].name + `</span>
                     </label></td></tr>`;
-                $("#showTodo table tbody").append(markup);
+                if (trNumber > 0) {
+                    $("#showTodo table tr:first").before(markup);
+                } else {
+                    $("#showTodo table tbody").append(markup);
+                }
             }
             $('#todoName').val('');
         }

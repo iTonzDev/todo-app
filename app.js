@@ -21,9 +21,8 @@ app.get('/', function(req, res) {
 app.get('/todo-list', function(req, res) {
     //res.send or res.json
     var paramOut = {};
-    connection.query('select * from todo order by id desc', function(err, rows, fields) {
+    connection.query('select * from todo where active = \'Y\' order by id desc', function(err, rows, fields) {
         if (err) throw err;
-        //console.log(rows);
         paramOut.todolist = rows;
         id = rows.length;
         res.json(paramOut);
@@ -33,13 +32,25 @@ app.get('/todo-list', function(req, res) {
 app.post('/add', function(req, res) {
     //console.log('add');
     //console.log('todoName : ' + req.body.todoName);
-    var paramOut = {
-        "todolist": [{
-            "id": (++id),
-            "name": req.body.todoName
-        }]
-    }
-    res.json(paramOut);
+    var todoName = req.body.todoName;
+    var sql = 'insert into todo (name) values(\'' + todoName + '\')';
+    console.log('sql: ' + sql);
+    connection.query(sql, function(err, rows, fields) {
+        if (err) throw err;
+
+        var paramOut = {};
+        paramOut.todolist = [];
+        connection.query('select * from todo order by id desc', function(err, rows, fields) {
+            if (err) throw err;
+            for (var i in rows) {
+                if (todoName == rows[i].name) {
+                    paramOut.todolist.push(rows[i]);
+                    break;
+                }
+            }
+            res.json(paramOut);
+        });
+    });
 });
 
 app.put('/update', function(req, res) {
